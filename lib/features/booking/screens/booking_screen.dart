@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/primary_button.dart';
 import '../../../data/mock_data.dart';
+import '../../../models/service_tier.dart';
+import '../../../models/worker.dart';
 
 class BookingScreen extends StatefulWidget {
   final String workerId;
@@ -16,10 +18,48 @@ class BookingScreen extends StatefulWidget {
 class _BookingScreenState extends State<BookingScreen> {
   final _selectedAddress = 'Home';
   bool _isScheduled = false;
+  ServiceTier _tier = ServiceTier.fixed;
+  double _hours = 1;
+
+  Worker get _worker =>
+      MockData.workers.firstWhere((w) => w.id == widget.workerId);
+
+  List<ServiceTier> get _availableTiers {
+    final tiers = <ServiceTier>[ServiceTier.fixed];
+    if (_worker.offersHourly) tiers.add(ServiceTier.hourly);
+    if (_worker.offersContract) tiers.add(ServiceTier.contract);
+    return tiers;
+  }
+
+  double get _tierTotal {
+    switch (_tier) {
+      case ServiceTier.fixed:
+        return _worker.fixedTotal(_worker.distanceKm);
+      case ServiceTier.hourly:
+        return (_worker.hourlyRate ?? _worker.priceEstimate) * _hours;
+      case ServiceTier.contract:
+        return _worker.contractVisitFee ?? _worker.priceEstimate;
+    }
+  }
+
+  String get _tierNote {
+    switch (_tier) {
+      case ServiceTier.fixed:
+        final beyond = (_worker.distanceKm - 3).clamp(0.0, double.infinity);
+        if (beyond > 0) {
+          return 'Includes ₹${(beyond * 20).round()} distance charge for ${_worker.distanceKm} km';
+        }
+        return 'Price locked upfront. Distance within free radius included.';
+      case ServiceTier.hourly:
+        return 'Billed by time, paid by the session. Distance fee included.';
+      case ServiceTier.contract:
+        return 'Visit fee shown. Final amount confirmed by worker after assessment.';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final worker = MockData.workers.firstWhere((w) => w.id == widget.workerId);
+    final worker = _worker;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Confirm Booking')),
@@ -57,7 +97,7 @@ class _BookingScreenState extends State<BookingScreen> {
                           ),
                         ),
                         Text(
-                          '₹${worker.priceEstimate.toInt()} estimated',
+                          '₹${_tierTotal.round()} estimated',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             color: AppColors.primary,
                             fontWeight: FontWeight.w600,
@@ -69,6 +109,56 @@ class _BookingScreenState extends State<BookingScreen> {
                 ],
               ),
             ),
+            const SizedBox(height: 24),
+            Text(
+              'Choose a plan',
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 12),
+            ..._availableTiers.map((tier) => _tierCard(context, tier)),
+            if (_tier == ServiceTier.hourly) ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceVariant,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Estimated Duration',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: Slider(
+                            value: _hours,
+                            min: 1,
+                            max: 8,
+                            divisions: 7,
+                            label: '${_hours.round()} hr',
+                            activeColor: AppColors.primary,
+                            onChanged: (v) => setState(() => _hours = v),
+                          ),
+                        ),
+                        Text(
+                          '${_hours.round()} hr',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: 24),
             Text(
               'Service Address',
@@ -136,53 +226,11 @@ class _BookingScreenState extends State<BookingScreen> {
             Row(
               children: [
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () => setState(() => _isScheduled = false),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      decoration: BoxDecoration(
-                        color: !_isScheduled ? AppColors.primary : AppColors.surface,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: !_isScheduled ? AppColors.primary : AppColors.divider,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Now',
-                          style: TextStyle(
-                            color: !_isScheduled ? AppColors.textOnPrimary : AppColors.textSecondary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  child: _timeChip(context, 'Now', !_isScheduled, () => setState(() => _isScheduled = false)),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: GestureDetector(
-                    onTap: () => setState(() => _isScheduled = true),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      decoration: BoxDecoration(
-                        color: _isScheduled ? AppColors.primary : AppColors.surface,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                          color: _isScheduled ? AppColors.primary : AppColors.divider,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Schedule',
-                          style: TextStyle(
-                            color: _isScheduled ? AppColors.textOnPrimary : AppColors.textSecondary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
+                  child: _timeChip(context, 'Schedule', _isScheduled, () => setState(() => _isScheduled = true)),
                 ),
               ],
             ),
@@ -203,7 +251,15 @@ class _BookingScreenState extends State<BookingScreen> {
                 ),
               ),
             ],
-            const SizedBox(height: 28),
+            const SizedBox(height: 16),
+            Text(
+              _tierNote,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.textSecondary,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+            const SizedBox(height: 12),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
@@ -219,7 +275,7 @@ class _BookingScreenState extends State<BookingScreen> {
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
                   ),
                   Text(
-                    '₹${worker.priceEstimate.toInt()}',
+                    '₹${_tierTotal.round()}',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w700,
                       color: AppColors.primary,
@@ -239,5 +295,103 @@ class _BookingScreenState extends State<BookingScreen> {
         ),
       ),
     );
+  }
+
+  Widget _timeChip(BuildContext context, String label, bool selected, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.primary : AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: selected ? AppColors.primary : AppColors.divider),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(
+              color: selected ? AppColors.textOnPrimary : AppColors.textSecondary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _tierCard(BuildContext context, ServiceTier tier) {
+    final selected = tier == _tier;
+    return GestureDetector(
+      onTap: () => setState(() => _tier = tier),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: selected ? AppColors.primarySurface : AppColors.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: selected ? AppColors.primary : AppColors.divider,
+            width: selected ? 1.5 : 0.5,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              switch (tier) {
+                ServiceTier.fixed => Icons.price_check,
+                ServiceTier.hourly => Icons.schedule,
+                ServiceTier.contract => Icons.description_outlined,
+              },
+              color: selected ? AppColors.primary : AppColors.textSecondary,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        tier.label,
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        _tierPriceLabel(tier),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    tier.description,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (selected)
+              const Icon(Icons.check_circle, color: AppColors.primary),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _tierPriceLabel(ServiceTier tier) {
+    switch (tier) {
+      case ServiceTier.fixed:
+        return '₹${_worker.priceEstimate.round()}';
+      case ServiceTier.hourly:
+        return '₹${(_worker.hourlyRate ?? _worker.priceEstimate).round()}/hr';
+      case ServiceTier.contract:
+        return '₹${(_worker.contractVisitFee ?? 0).round()} visit';
+    }
   }
 }

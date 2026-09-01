@@ -56,8 +56,13 @@ class _BookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final paid = booking.status == BookingStatus.completed && booking.isPaid;
     return GestureDetector(
-      onTap: () => context.push('/bookings/${booking.id}/track'),
+      onTap: () => context.push(
+        paid
+            ? '/bookings/${booking.id}/receipt'
+            : '/bookings/${booking.id}/track',
+      ),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(

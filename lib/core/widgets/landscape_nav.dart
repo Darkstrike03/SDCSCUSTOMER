@@ -43,7 +43,7 @@ class _LandscapeNavState extends State<LandscapeNav> {
     return LandscapeShellScope(
       isInLandscapeShell: true,
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: AppColors.frame,
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -54,12 +54,21 @@ class _LandscapeNavState extends State<LandscapeNav> {
                 children: [
                   _buildRail(context),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        const AddressBanner(),
-                        Expanded(child: widget.child),
-                      ],
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        bottomLeft: Radius.circular(20),
+                      ),
+                      child: Material(
+                        color: AppColors.surface,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const AddressBanner(),
+                            Expanded(child: widget.child),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -74,7 +83,7 @@ class _LandscapeNavState extends State<LandscapeNav> {
   Widget _buildHeader(BuildContext context) {
     return Container(
       height: 64,
-      color: AppColors.surface,
+      color: AppColors.frame,
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
         children: [
@@ -119,7 +128,7 @@ class _LandscapeNavState extends State<LandscapeNav> {
         duration: const Duration(milliseconds: 220),
         curve: Curves.easeOut,
         width: _railExtended ? 240 : 76,
-        color: AppColors.surface,
+        color: AppColors.frame,
         child: ListView(
           padding: const EdgeInsets.symmetric(vertical: 8),
           children: List.generate(AppNav.items.length, (index) {

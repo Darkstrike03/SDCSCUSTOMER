@@ -19,8 +19,9 @@ class MockData {
     const Worker(
       id: 'w1', name: 'Rajesh Kumar', photoUrl: '', rating: 4.8,
       reviewCount: 124, distanceKm: 1.2, isVerified: true, yearsActive: 8,
-      completedJobs: 340, skills: ['Wiring', 'Inverter Repair', 'Fan Installation'],
-      categoryId: 'electrician', priceEstimate: 350, availableToday: true,
+      completedJobs: 340,       skills: ['Wiring', 'Inverter Repair', 'Fan Installation'],
+      categoryId: 'electrician', priceEstimate: 350, hourlyRate: 300,
+      contractVisitFee: 200, availableToday: true,
       about: 'Certified electrician with over 8 years of experience in residential '
           'wiring, inverter repair and smart-home installations. Known for neat work, '
           'clear estimates and always leaving the workspace spotless.',
@@ -37,16 +38,18 @@ class MockData {
     const Worker(
       id: 'w3', name: 'Suresh Patel', photoUrl: '', rating: 4.7,
       reviewCount: 98, distanceKm: 1.8, isVerified: true, yearsActive: 6,
-      completedJobs: 275, skills: ['Pipe Fitting', 'Leak Repair', 'Bathroom Fitting'],
-      categoryId: 'plumber', priceEstimate: 400, availableToday: false,
+      completedJobs: 275,       skills: ['Pipe Fitting', 'Leak Repair', 'Bathroom Fitting'],
+      categoryId: 'plumber', priceEstimate: 400, hourlyRate: 350,
+      contractVisitFee: 250, availableToday: false,
       about: 'Experienced plumber specialising in leak repair, pipe fitting and '
           'bathroom fittings. Sudden emergencies handled with priority.',
     ),
     const Worker(
       id: 'w4', name: 'Mohammad Ali', photoUrl: '', rating: 4.3,
       reviewCount: 56, distanceKm: 3.1, isVerified: true, yearsActive: 3,
-      completedJobs: 110, skills: ['Drain Cleaning', 'Tap Repair', 'Water Tank'],
-      categoryId: 'plumber', priceEstimate: 350, availableToday: true,
+      completedJobs: 110,       skills: ['Drain Cleaning', 'Tap Repair', 'Water Tank'],
+      categoryId: 'plumber', priceEstimate: 350, hourlyRate: 300,
+      availableToday: true,
       about: 'Reliable plumber for drain cleaning, tap repair and water tank '
           'services. Answers quickly and turns up on time.',
     ),
@@ -101,14 +104,16 @@ class MockData {
       id: 'b1', serviceName: 'Electrical Wiring', workerId: 'w1',
       workerName: 'Rajesh Kumar', workerPhotoUrl: '', addressLabel: 'Home',
       addressDetail: '12, Green Park Colony, Sector 5', type: BookingType.immediate,
-      status: BookingStatus.inProgress, createdAt: DateTime.now().subtract(const Duration(hours: 2)),
-      priceEstimate: 350,
+      tier: ServiceTier.contract, contractVisitFee: 200,
+      status: BookingStatus.workerEnRoute, createdAt: DateTime.now().subtract(const Duration(hours: 2)),
+      priceEstimate: 200,
     ),
     Booking(
       id: 'b2', serviceName: 'Bathroom Plumbing', workerId: 'w3',
       workerName: 'Suresh Patel', workerPhotoUrl: '', addressLabel: 'Work',
       addressDetail: '45, MG Road, Near SBI', type: BookingType.scheduled,
-      status: BookingStatus.confirmed, createdAt: DateTime.now().subtract(const Duration(days: 1)),
+      tier: ServiceTier.fixed, status: BookingStatus.confirmed,
+      createdAt: DateTime.now().subtract(const Duration(days: 1)),
       scheduledDateTime: DateTime.now().add(const Duration(days: 2)),
       priceEstimate: 400,
     ),
@@ -116,8 +121,40 @@ class MockData {
       id: 'b3', serviceName: 'Deep Cleaning', workerId: 'w5',
       workerName: 'Priya Devi', workerPhotoUrl: '', addressLabel: 'Home',
       addressDetail: '12, Green Park Colony, Sector 5', type: BookingType.immediate,
-      status: BookingStatus.completed, createdAt: DateTime.now().subtract(const Duration(days: 5)),
+      tier: ServiceTier.hourly, hourlyRate: 450,
+      status: BookingStatus.completed, isPaid: true,
+      createdAt: DateTime.now().subtract(const Duration(days: 5)),
       priceEstimate: 500,
+    ),
+  ];
+
+  static final List<Quote> quotes = [
+    Quote(
+      status: 'pending', bookingId: 'b1', proposedAmount: 4500,
+      proposedTimeline: '3 days (2 visits)', consultancyFee: 200,
+      distanceFee: 40, proposedAt: DateTime.now().subtract(const Duration(minutes: 45)),
+    ),
+  ];
+
+  static final List<Receipt> receipts = [
+    Receipt(
+      id: 'r1', bookingId: 'b3', serviceName: 'Deep Cleaning',
+      workerName: 'Priya Devi', paymentMethod: 'UPI · priya@upi',
+      baseAmount: 500, tax: 0, tip: 50, total: 550,
+      paidAt: DateTime.now().subtract(const Duration(days: 5)),
+    ),
+  ];
+
+  static final List<WorkSession> workSessions = [
+    WorkSession(
+      id: 'ws1', bookingId: 'b3', isPause: false,
+      startTime: DateTime.now().subtract(const Duration(days: 5, hours: 2)),
+      endTime: DateTime.now().subtract(const Duration(days: 5, hours: 1)),
+    ),
+    WorkSession(
+      id: 'ws2', bookingId: 'b3', isPause: false,
+      startTime: DateTime.now().subtract(const Duration(days: 5, hours: 1)),
+      endTime: DateTime.now().subtract(const Duration(days: 5)),
     ),
   ];
 
