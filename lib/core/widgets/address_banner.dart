@@ -18,6 +18,7 @@ class AddressBanner extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20),
         decoration: BoxDecoration(
           color: AppColors.primarySurface.withValues(alpha: 0.6),
+          borderRadius: BorderRadius.only(bottomRight: Radius.circular(16)),
           border: Border(
             bottom: BorderSide(color: AppColors.divider, width: 0.5),
           ),

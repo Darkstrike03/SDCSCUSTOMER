@@ -5,8 +5,14 @@ import 'address_banner.dart';
 class ShellScaffold extends StatelessWidget {
   final PreferredSizeWidget? appBar;
   final Widget body;
+  final bool showAddressBanner;
 
-  const ShellScaffold({super.key, this.appBar, required this.body});
+  const ShellScaffold({
+    super.key,
+    this.appBar,
+    required this.body,
+    this.showAddressBanner = true,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +20,8 @@ class ShellScaffold extends StatelessWidget {
       appBar: appBar,
       body: Column(
         children: [
-          if (!LandscapeShellScope.of(context)) const AddressBanner(),
+          if (showAddressBanner && !LandscapeShellScope.of(context))
+            const AddressBanner(),
           Expanded(child: body),
         ],
       ),
