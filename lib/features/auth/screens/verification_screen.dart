@@ -72,9 +72,10 @@ class _VerificationScreenState extends ConsumerState<VerificationScreen> {
     }
   }
 
-  void _resend() {
+  Future<void> _resend() async {
     if (_resendCooldown > 0) return;
     _startCooldown();
+    await ref.read(authProvider.notifier).resendVerification();
   }
 
   @override
@@ -149,6 +150,7 @@ class _VerificationScreenState extends ConsumerState<VerificationScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(6, (i) {
                       return Container(
+                        key: ValueKey('otp-$i'),
                         width: 48,
                         height: 56,
                         margin: const EdgeInsets.symmetric(horizontal: 4),

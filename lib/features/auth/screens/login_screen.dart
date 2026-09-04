@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/auth_scaffold.dart';
 import '../../../core/providers/auth_provider.dart';
@@ -16,8 +17,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
-  bool _obscure = true;
   bool _loading = false;
+  bool _obscure = true;
+  String? _errorMessage;
 
   @override
   void dispose() {
@@ -28,14 +30,33 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() => _loading = true);
-    final ok = await ref.read(authProvider.notifier).login(
-          _emailCtrl.text.trim(),
-          _passwordCtrl.text,
-        );
-    if (!mounted) return;
-    setState(() => _loading = false);
-    if (ok) context.go('/');
+    setState(() {
+      _loading = true;
+      _errorMessage = null;
+    });
+    try {
+      final ok = await ref.read(authProvider.notifier).login(
+            _emailCtrl.text.trim(),
+            _passwordCtrl.text,
+          );
+      if (!mounted) return;
+      setState(() => _loading = false);
+      if (ok) {
+        context.go('/');
+      }
+    } on AuthException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _errorMessage = e.message;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _errorMessage = e.toString();
+      });
+    }
   }
 
   @override
@@ -93,6 +114,17 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               return null;
             },
           ),
+          if (_errorMessage != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              _errorMessage!,
+              style: const TextStyle(
+                color: AppColors.error,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
           const SizedBox(height: 12),
           Align(
             alignment: Alignment.centerRight,

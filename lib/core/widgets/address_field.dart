@@ -47,7 +47,7 @@ class _AddressFieldState extends ConsumerState<AddressField> {
           readOnly: true,
           controller: _controller,
           decoration: const InputDecoration(
-            hintText: 'Add an address for delivery',
+            hintText: 'Please add address',
             prefixIcon: Icon(
               Icons.location_on_outlined,
               color: AppColors.textHint,

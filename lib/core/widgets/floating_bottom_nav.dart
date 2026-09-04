@@ -65,6 +65,7 @@ class _FloatingBottomNavState extends State<FloatingBottomNav> {
                 final item = AppNav.items[index];
                 final isSelected = index == _selectedIndex;
                 return Expanded(
+                  key: ValueKey('nav-$index'),
                   child: GestureDetector(
                     behavior: HitTestBehavior.opaque,
                     onTap: () {

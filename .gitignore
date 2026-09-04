@@ -3,6 +3,8 @@
 *.log
 *.pyc
 *.swp
+.env
+customer-app-context.md
 .DS_Store
 .atom/
 .build/

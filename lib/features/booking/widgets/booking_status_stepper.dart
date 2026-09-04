@@ -48,13 +48,16 @@ class BookingStatusStepper extends StatelessWidget {
               : i < currentIndex
                   ? _StepState.completed
                   : _StepState.pending;
-      return _buildStepRow(
-        context,
-        icon: step.$4,
-        title: step.$2,
-        subtitle: step.$3,
-        state: state,
-        isCancelled: isCancelled,
+      return KeyedSubtree(
+        key: ValueKey('step-$i'),
+        child: _buildStepRow(
+          context,
+          icon: step.$4,
+          title: step.$2,
+          subtitle: step.$3,
+          state: state,
+          isCancelled: isCancelled,
+        ),
       );
     });
   }

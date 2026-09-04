@@ -25,7 +25,10 @@ class NotificationsScreen extends StatelessWidget {
               ),
               itemCount: notifications.length,
               separatorBuilder: (_, _) => const SizedBox(height: 8),
-              itemBuilder: (context, index) => NotificationCard(notification: notifications[index]),
+              itemBuilder: (context, index) => NotificationCard(
+                key: ValueKey('notification-$index'),
+                notification: notifications[index],
+              ),
             ),
     );
   }

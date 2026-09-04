@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../theme/app_colors.dart';
-import '../../data/mock_data.dart';
 import '../../models/address.dart';
 import '../providers/address_provider.dart';
 import 'floating_bottom_nav.dart';
@@ -21,7 +20,7 @@ class AddressSelectorSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final addresses = MockData.addresses;
+    final addresses = ref.watch(addressListProvider);
     final selected = ref.watch(selectedAddressProvider);
 
     return Container(
@@ -67,6 +66,7 @@ class AddressSelectorSheet extends ConsumerWidget {
             else
               ...addresses.map(
                 (addr) => _AddressTile(
+                  key: ValueKey('addr-${addr.id}'),
                   address: addr,
                   isSelected: selected?.id == addr.id,
                   onTap: () {
@@ -79,7 +79,7 @@ class AddressSelectorSheet extends ConsumerWidget {
             OutlinedButton.icon(
               onPressed: () {
                 Navigator.of(context).pop();
-                context.push('/profile/addresses');
+                context.push('/profile/addresses/new');
               },
               icon: const Icon(Icons.add),
               label: const Text('Add Address'),
@@ -98,6 +98,7 @@ class _AddressTile extends StatelessWidget {
   final VoidCallback onTap;
 
   const _AddressTile({
+    super.key,
     required this.address,
     required this.isSelected,
     required this.onTap,

@@ -34,7 +34,7 @@ class AddressBanner extends ConsumerWidget {
             Expanded(
               child: selected == null
                   ? Text(
-                      'Add an address for delivery',
+                      'Please add address',
                       overflow: TextOverflow.ellipsis,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: AppColors.textSecondary,

@@ -40,7 +40,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                   border: Border.all(color: AppColors.divider, width: 0.5),
                 ),
                 child: ExpansionTile(
-                  key: ValueKey(i),
+                  key: ValueKey('faq-$i'),
                   initiallyExpanded: isExpanded,
                   onExpansionChanged: (expanded) {
                     setState(() => _expandedIndex = expanded ? i : null);

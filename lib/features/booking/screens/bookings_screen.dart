@@ -34,7 +34,11 @@ class BookingsScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 final booking = bookings[index];
                 final worker = _workerFor(booking);
-                return _BookingCard(booking: booking, worker: worker);
+                return _BookingCard(
+                  key: ValueKey('booking-${booking.id}'),
+                  booking: booking,
+                  worker: worker,
+                );
               },
             ),
     );
@@ -52,7 +56,7 @@ class _BookingCard extends StatelessWidget {
   final Booking booking;
   final Worker? worker;
 
-  const _BookingCard({required this.booking, required this.worker});
+  const _BookingCard({super.key, required this.booking, required this.worker});
 
   @override
   Widget build(BuildContext context) {

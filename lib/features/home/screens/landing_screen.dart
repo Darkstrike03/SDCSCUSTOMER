@@ -241,10 +241,13 @@ class _FeaturesSection extends StatelessWidget {
                 spacing: 24,
                 runSpacing: 24,
                 children: features
-                    .map((f) => _FeatureCard(
-                          icon: f.icon,
-                          title: f.title,
-                          desc: f.desc,
+                    .asMap()
+                    .entries
+                    .map((entry) => _FeatureCard(
+                          key: ValueKey('landing-feature-${entry.key}'),
+                          icon: entry.value.icon,
+                          title: entry.value.title,
+                          desc: entry.value.desc,
                         ))
                     .toList(),
               ),
@@ -262,6 +265,7 @@ class _FeatureCard extends StatelessWidget {
   final String desc;
 
   const _FeatureCard({
+    super.key,
     required this.icon,
     required this.title,
     required this.desc,

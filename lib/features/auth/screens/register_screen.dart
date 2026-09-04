@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/auth_scaffold.dart';
 import '../../../core/providers/auth_provider.dart';
@@ -23,6 +24,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
   bool _loading = false;
+  String? _errorMessage;
 
   @override
   void dispose() {
@@ -75,15 +77,36 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() => _loading = true);
-    final ok = await ref.read(authProvider.notifier).register(
-          _nameCtrl.text.trim(),
-          _emailCtrl.text.trim(),
-          _passwordCtrl.text,
-        );
-    if (!mounted) return;
-    setState(() => _loading = false);
-    if (ok) context.go('/verify');
+    setState(() {
+      _loading = true;
+      _errorMessage = null;
+    });
+    try {
+      final ok = await ref.read(authProvider.notifier).register(
+            _nameCtrl.text.trim(),
+            _emailCtrl.text.trim(),
+            _passwordCtrl.text,
+          );
+      if (!mounted) return;
+      setState(() => _loading = false);
+      if (ok) {
+        context.go('/');
+      } else {
+        context.go('/verify');
+      }
+    } on AuthException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _errorMessage = e.message;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _loading = false;
+        _errorMessage = e.toString();
+      });
+    }
   }
 
   @override
@@ -239,6 +262,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             },
           ),
           const SizedBox(height: 28),
+          if (_errorMessage != null) ...[
+            Text(
+              _errorMessage!,
+              style: const TextStyle(
+                color: AppColors.error,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
           FilledButton(
             onPressed: _loading ? null : _submit,
             style: FilledButton.styleFrom(

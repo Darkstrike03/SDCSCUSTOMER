@@ -93,8 +93,10 @@ class EmergencyMatchScreen extends StatelessWidget {
                   Wrap(
                     spacing: 6,
                     runSpacing: 6,
-                    children: worker.skills.map((s) {
+                    children: worker.skills.asMap().entries.map((entry) {
+                      final s = entry.value;
                       return Container(
+                        key: ValueKey('em-skills-${entry.key}'),
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
                           color: AppColors.primarySurface,

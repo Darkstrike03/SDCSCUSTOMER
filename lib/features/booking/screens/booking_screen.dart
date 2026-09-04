@@ -168,6 +168,7 @@ class _BookingScreenState extends State<BookingScreen> {
             ...MockData.addresses.map((addr) {
               final isSelected = addr.label == _selectedAddress;
               return GestureDetector(
+                key: ValueKey('book-addr-${addr.label}'),
                 onTap: () => setState(() {}),
                 child: Container(
                   margin: const EdgeInsets.only(bottom: 10),
@@ -323,6 +324,7 @@ class _BookingScreenState extends State<BookingScreen> {
   Widget _tierCard(BuildContext context, ServiceTier tier) {
     final selected = tier == _tier;
     return GestureDetector(
+      key: ValueKey('tier-${tier.name}'),
       onTap: () => setState(() => _tier = tier),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),

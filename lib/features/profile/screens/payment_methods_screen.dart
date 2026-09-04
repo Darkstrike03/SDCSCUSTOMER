@@ -18,6 +18,7 @@ class PaymentMethodsScreen extends StatelessWidget {
         itemBuilder: (context, index) {
           final method = methods[index];
           return Container(
+            key: ValueKey('payment-method-${method.displayValue}'),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: AppColors.surface,

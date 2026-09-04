@@ -91,7 +91,10 @@ class _ServiceCategoryPagerState extends State<ServiceCategoryPager> {
                 itemCount: items.length,
                 itemBuilder: (context, i) {
                   final cat = items[i];
-                  return _buildTile(context, cat, pillSize);
+                  return KeyedSubtree(
+                    key: ValueKey('svc-tile-$index-$i'),
+                    child: _buildTile(context, cat, pillSize),
+                  );
                 },
               );
             },

@@ -55,7 +55,10 @@ class WorkerListScreen extends StatelessWidget {
                     ),
                     itemCount: filteredWorkers.length,
                     separatorBuilder: (_, _) => const SizedBox(height: 12),
-                    itemBuilder: (context, index) => WorkerCard(worker: filteredWorkers[index]),
+                    itemBuilder: (context, index) => WorkerCard(
+                      key: ValueKey('worker-${filteredWorkers[index].id}'),
+                      worker: filteredWorkers[index],
+                    ),
                   ),
           ),
         ],

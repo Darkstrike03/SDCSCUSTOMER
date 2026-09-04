@@ -26,7 +26,11 @@ class BookAgainSection extends StatelessWidget {
         itemBuilder: (context, index) {
           final booking = recentBookings[index];
           final worker = _workerFor(booking);
-          return _BookAgainCard(booking: booking, worker: worker);
+          return _BookAgainCard(
+            key: ValueKey('book-again-${booking.id}'),
+            booking: booking,
+            worker: worker,
+          );
         },
       ),
     );
@@ -44,7 +48,7 @@ class _BookAgainCard extends StatelessWidget {
   final Booking booking;
   final Worker? worker;
 
-  const _BookAgainCard({required this.booking, required this.worker});
+  const _BookAgainCard({super.key, required this.booking, required this.worker});
 
   @override
   Widget build(BuildContext context) {

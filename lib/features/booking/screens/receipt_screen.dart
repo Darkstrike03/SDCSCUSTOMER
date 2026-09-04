@@ -121,20 +121,21 @@ class ReceiptScreen extends StatelessWidget {
             ],
           ),
           const Divider(height: 28, color: AppColors.divider),
-          ...rows.map(
-            (r) => Padding(
+          ...rows.asMap().entries.map(
+            (entry) => Padding(
+              key: ValueKey('receipt-row-${entry.key}'),
               padding: const EdgeInsets.symmetric(vertical: 6),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    r.$1,
+                    entry.value.$1,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.textSecondary,
                     ),
                   ),
                   Text(
-                    r.$2,
+                    entry.value.$2,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
                   ),
                 ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/auth_provider.dart';
+import '../providers/customer_data_provider.dart';
 import '../theme/app_colors.dart';
 
 /// A teal hero banner with rounded bottom corners, shadow, and greeting text.
@@ -17,7 +18,10 @@ class HomeHero extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final raw = ref.watch(authProvider).name;
+    final customer = ref.watch(customerDataProvider).valueOrNull;
+    final raw = customer?.fullName.isNotEmpty == true
+        ? customer!.fullName
+        : ref.watch(authProvider).name;
     final safe = (raw == null || raw.trim().isEmpty)
         ? 'there'
         : raw.trim().split(RegExp(r'\s+')).first;

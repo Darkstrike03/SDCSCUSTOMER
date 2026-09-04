@@ -89,6 +89,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 ),
                 const SizedBox(height: 10),
                 ...MockData.paymentMethods.map((pm) => Container(
+                      key: ValueKey('pm-${pm.displayValue}'),
                       margin: const EdgeInsets.only(bottom: 10),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(

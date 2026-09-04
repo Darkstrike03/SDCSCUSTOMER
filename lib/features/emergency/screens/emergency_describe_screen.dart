@@ -65,9 +65,11 @@ class _EmergencyDescribeScreenState extends State<EmergencyDescribeScreen> {
             ),
             const SizedBox(height: 12),
             Row(
-              children: _categories.map((cat) {
+              children: _categories.asMap().entries.map((entry) {
+                final cat = entry.value;
                 final isSelected = cat['id'] == _selectedCategory;
                 return Expanded(
+                  key: ValueKey('emergency-cat-${cat['id']}'),
                   child: GestureDetector(
                     onTap: () => setState(() => _selectedCategory = cat['id'] as String),
                     child: Container(

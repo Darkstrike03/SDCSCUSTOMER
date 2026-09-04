@@ -135,6 +135,7 @@ class _LandscapeNavState extends State<LandscapeNav> {
             final item = AppNav.items[index];
             final isSelected = index == _selectedIndex;
             return _RailDestination(
+              key: ValueKey('rail-$index'),
               icon: isSelected ? item.selectedIcon : item.icon,
               label: item.label,
               isSelected: isSelected,
@@ -154,6 +155,7 @@ class _RailDestination extends StatelessWidget {
   final VoidCallback onTap;
 
   const _RailDestination({
+    super.key,
     required this.icon,
     required this.label,
     required this.isSelected,

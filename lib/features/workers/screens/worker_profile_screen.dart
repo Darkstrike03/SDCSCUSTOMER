@@ -325,6 +325,7 @@ class WorkerProfileScreen extends StatelessWidget {
         const SizedBox(height: 14),
         ...reviews.take(2).map(
           (r) => Padding(
+            key: ValueKey('review-d-${r.name}'),
             padding: const EdgeInsets.only(bottom: 16),
             child: _reviewCard(context, r),
           ),
@@ -717,22 +718,26 @@ class WorkerProfileScreen extends StatelessWidget {
           spacing: 8,
           runSpacing: 8,
           children: [
-            ...shown.map(
-              (skill) => Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(
-                  color: AppColors.primarySurface,
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
-                ),
-                child: Text(
-                  skill,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
+            ...shown.asMap().entries.map(
+              (entry) {
+                final skill = entry.value;
+                return Container(
+                  key: ValueKey('expertise-${entry.key}'),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primarySurface,
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
                   ),
-                ),
-              ),
+                  child: Text(
+                    skill,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                );
+              },
             ),
             if (extra > 0)
               Container(
@@ -780,6 +785,7 @@ class WorkerProfileScreen extends StatelessWidget {
         const SizedBox(height: 6),
         ...reviews.take(2).map(
           (r) => Padding(
+            key: ValueKey('review-m-${r.name}'),
             padding: const EdgeInsets.only(bottom: 12),
             child: _reviewCard(context, r),
           ),
@@ -834,6 +840,7 @@ class WorkerProfileScreen extends StatelessWidget {
                     Row(
                       children: List.generate(5, (i) {
                         return Icon(
+                          key: ValueKey('review-star-$i'),
                           i < review.rating ? Icons.star : Icons.star_border,
                           size: 14,
                           color: AppColors.warning,

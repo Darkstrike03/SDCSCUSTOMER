@@ -24,17 +24,18 @@ import '../../features/profile/screens/profile_screen.dart';
 import '../../features/profile/screens/saved_addresses_screen.dart';
 import '../../features/profile/screens/payment_methods_screen.dart';
 import '../../features/profile/screens/help_support_screen.dart';
+import '../../features/profile/screens/add_address_screen.dart';
+import '../../models/customer_data.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 final goRouterProvider = Provider<GoRouter>((ref) {
-  final auth = ref.watch(authProvider);
-
-  return GoRouter(
+  final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/',
     redirect: (context, state) {
+      final auth = ref.read(authProvider);
       final loggedIn = auth.isLoggedIn;
       final path = state.uri.toString();
       final onAuthRoute = path == '/login' ||
@@ -147,6 +148,14 @@ final goRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const SavedAddressesScreen(),
       ),
       GoRoute(
+        path: '/profile/addresses/new',
+        builder: (context, state) => AddAddressScreen(
+          existing: state.extra is CustomerAddress
+              ? state.extra as CustomerAddress
+              : null,
+        ),
+      ),
+      GoRoute(
         path: '/profile/payments',
         builder: (context, state) => const PaymentMethodsScreen(),
       ),
@@ -156,4 +165,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       ),
     ],
   );
+
+  ref.listen(authProvider, (previous, next) => router.refresh());
+  return router;
 });
